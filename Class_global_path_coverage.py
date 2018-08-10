@@ -1,5 +1,5 @@
 # required for display purpose only , comment when not using 
-%matplotlib nbagg
+#%matplotlib nbagg
 
 # lib required for functioning.
 import numpy as np
@@ -33,7 +33,7 @@ class gloabl_path_coverage:
             array_points  = dataframe.apply(pd.to_numeric, args=('coerce',)).values
             
         except Exception as ex:
-            print ("gloabl_path_coverage.load_data: Exception while reading data from file and converting to numpy array  ")
+            print ("gloabl_path_coverage.load_data: Exception while reading data from file and converting to numpy array : " + str(ex))
             return False
             
         # in case file read with no errors proceed further.
@@ -55,7 +55,7 @@ class gloabl_path_coverage:
                 tempBoundary.append(point)
             
         except Exception as ex:
-            print ("gloabl_path_coverage.load_data: Exception while separting various different boundaries and stoaring in a List.  ") 
+            print ("gloabl_path_coverage.load_data: Exception while separting various different boundaries and stoaring in a List.  : " + str(ex)) 
             return False
         
         # in case no issues return true stating success
@@ -65,10 +65,10 @@ class gloabl_path_coverage:
         try:
             for boundary in self.list_boundaries:
                 points = np.array(boundary)
-                self.list_polygons.append(Ploygon(points))
+                self.list_polygons.append(Polygon(points))
                 
         except Exception as ex:
-            print ("gloabl_path_coverage.prepare_polygon: Exception while preparing polygon list from boundary lists  ") 
+            print ("gloabl_path_coverage.prepare_polygon---: Exception while preparing polygon list from boundary lists  : " + str(ex)) 
             return False
         
         # in case no issues return true stating success
@@ -77,13 +77,13 @@ class gloabl_path_coverage:
     def display_parameter(self):
         try:
             for boundary in self.list_boundaries:
-                for points in boundary
-                  plt.plot(points[0],points[1],'o')
+                for points in boundary:
+                    plt.plot(points[0],points[1],'o')
             plt.show()   
         except Exception as ex:
-            print ("gloabl_path_coverage.display_parameter: Exception while displaying parameters  ") 
+            print ("gloabl_path_coverage.display_parameter: Exception while displaying parameters : " + str(ex)) 
             
-    
+    #called by internal function , need not be called explicitly
     def prepare_edges(self):
         try:
             min_x,min_y,max_x,max_y=self.list_polygons[0].bounds
@@ -102,10 +102,11 @@ class gloabl_path_coverage:
                                 edges.append([longitude[x],latitude[y]])
             
         except Exception as ex:
-            print ("gloabl_path_coverage.prepare_edges : Can't process edges")
+            print ("gloabl_path_coverage.prepare_edges : Can't process edges: " + str(ex))
             return []
         return edges
-  
+    
+    #called by internal function , need not be called explicitly
     def move_next(self,curr_pos,traversed_list):
         try:
             for move in self.moves:
@@ -123,13 +124,15 @@ class gloabl_path_coverage:
                             return [next_x,next_y]
             return None
         except Exception as ex:
-            print ("gloabl_path_coverage.move_next : Exception in calculating next move")
-        
+            print ("gloabl_path_coverage.move_next : Exception in calculating next move : " + str(ex))
+    
+    #function
+    #Returns : list of points to be traversed
     def gen_traversedList(self):
         
         try:
-            edges = prepare_edges()
-            current_pos = edges [0]
+            edges = self.prepare_edges()
+            current_pos = edges[0]
             traversed_list = []
 
             while len(edges)!=0 :
@@ -137,12 +140,12 @@ class gloabl_path_coverage:
                 if current_pos == None:
                     current_pos = edges[0]
                 edges.remove(current_pos)
-                self.traversed_list.append(current_pos)
-                current_pos = move_next(current_pos,traversed_list)
+                traversed_list.append(current_pos)
+                current_pos = self.move_next(current_pos,traversed_list)
 
             return traversed_list
         except Exception as ex :
-            print ("gloabl_path_coverage.gen_traversedList : Exception in generating traversed list")
+            print ("gloabl_path_coverage.gen_traversedList : Exception in generating traversed list : " + str(ex))
             return []
         
         
